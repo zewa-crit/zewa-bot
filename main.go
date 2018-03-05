@@ -1,6 +1,7 @@
 package main
 
 import (
+	"strings"
 	"fmt"
 	"os"
 	// defacto default library for working with discord API
@@ -31,7 +32,6 @@ func main() {
 	}
 
 	// Get the env var value for the oauth2 token
-    // os.Setenv("DC_TOKEN","")
 	Token = os.Getenv("DC_TOKEN")
 
 	// Construct a new session and connect to the bot with oauth token,
@@ -73,13 +73,20 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	// If I'm the author Ignore the message even if triggered.
 	if m.Author.ID == BotID {
+		fmt.Println(m.Author.Username + ": " + m.Content)
 		return
 	}
 
-	if m.Content == "ping" {
-		// Send given string to channel where the trigger was send from.
-		_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
+	// Identify if the message has the right prefix and is interessting for us
+	if strings.HasPrefix(m.Content, BotPrefix)	{
+		if m.Content == BotPrefix + "ping" {
+			// Send given string to channel where the trigger was send from.
+			_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
+		} else {
+			fmt.Println("prefix was given but command not identified")
+			_, _ = s.ChannelMessageSend(m.ChannelID, "I'm sorry MASTER, little me don't understand this command.\nPlease Master, if you want that command explain me what I have to do!?")
+		}
 	}
 
-	fmt.Println(m.Content)
+	fmt.Println(m.Author.Username + ": " + m.Content)
 }
