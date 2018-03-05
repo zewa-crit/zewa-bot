@@ -11,3 +11,5 @@ dev-pingbot | [![](http://dockerbuildbadges.quelltext.eu/status.svg?organization
 ### Aim for this project
 
 Make our lives cooler
+
+Dieses Repo gehört mir
