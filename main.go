@@ -1,10 +1,12 @@
 package main
 
 import (
-	"strings"
 	"fmt"
 	"os"
+	"strings"
 	// defacto default library for working with discord API
+	"github.com/alexejk/go-warcraftlogs"
+	"github.com/alexejk/go-warcraftlogs/types/warcraft"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -51,7 +53,7 @@ func main() {
 	// User ID from active user object, from the bot itself.
 	BotID = u.ID
 
-	// Add message handler before opening the session to the bot. 
+	// Add message handler before opening the session to the bot.
 	dg.AddHandler(messageHandler)
 	err = dg.Open()
 
@@ -78,10 +80,16 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	// Identify if the message has the right prefix and is interessting for us
-	if strings.HasPrefix(m.Content, BotPrefix)	{
-		if m.Content == BotPrefix + "ping" {
+	if strings.HasPrefix(m.Content, BotPrefix) {
+		if m.Content == BotPrefix+"ping" {
 			// Send given string to channel where the trigger was send from.
 			_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
+		} else if m.Content == BotPrefix+"last raid" {
+			id := getLogs()
+			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s", id))
+		} else if m.Content == BotPrefix+"last fight" || m.Content == BotPrefix+"last boss" {
+			id := getLogs()
+			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s#fight=last&type=damage-done", id))
 		} else {
 			fmt.Println("prefix was given but command not identified")
 			_, _ = s.ChannelMessageSend(m.ChannelID, "I'm sorry MASTER, little me don't understand this command.\nPlease Master, if you want that command explain me what I have to do!?")
@@ -89,4 +97,12 @@ func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 
 	fmt.Println(m.Author.Username + ": " + m.Content)
+}
+
+func getLogs() string {
+	token := os.Getenv("WCL_TOKEN")
+	wclapi := warcraftlogs.New(token)
+	reports := wclapi.ReportsForGuild("Sons of Eredar", warcraft.Realm_Eredar, warcraft.Region_EU)
+	last := reports[len(reports)-1]
+	return *last.Id
 }
