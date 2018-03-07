@@ -1,12 +1,14 @@
 package main
 
 import (
+	//"github.com/alexejk/go-warcraftlogs"
 	"fmt"
 	"os"
 	"strings"
+	"time"
+	// Internal imports
+	"github.com/zewa-crit/zewa-bot/commands"
 	// defacto default library for working with discord API
-	"github.com/alexejk/go-warcraftlogs"
-	"github.com/alexejk/go-warcraftlogs/types/warcraft"
 	"github.com/bwmarrin/discordgo"
 )
 
@@ -25,7 +27,10 @@ var (
 	BotID string
 )
 
+var t0 time.Time
+
 func main() {
+	t0 = time.Now()
 	// Default BotPrefix to "!", then check if env var is set.
 	// if "BotPrefix" env is set override default value.
 	BotPrefix = "!"
@@ -43,6 +48,7 @@ func main() {
 		fmt.Println("error creating Discord session,", err)
 		return
 	}
+	fmt.Println("[INFO] Session Created")
 
 	// Get user object for active user; Who am I ?
 	u, err := dg.User("@me")
@@ -54,7 +60,8 @@ func main() {
 	BotID = u.ID
 
 	// Add message handler before opening the session to the bot.
-	dg.AddHandler(messageHandler)
+	dg.AddHandler(OnMessageCreate)
+	//dg.AddHandler(messageHandler)
 	err = dg.Open()
 
 	if err != nil {
@@ -70,39 +77,21 @@ func main() {
 
 }
 
-// simple message handler thats answers an ping command
-func messageHandler(s *discordgo.Session, m *discordgo.MessageCreate) {
+//OnMessageCreate handles message objects
+func OnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
+	if s == nil || m == nil {
+		return
+	}
 
-	// If I'm the author Ignore the message even if triggered.
 	if m.Author.ID == BotID {
 		fmt.Println(m.Author.Username + ": " + m.Content)
 		return
 	}
-
-	// Identify if the message has the right prefix and is interessting for us
+	
 	if strings.HasPrefix(m.Content, BotPrefix) {
-		if m.Content == BotPrefix+"ping" {
-			// Send given string to channel where the trigger was send from.
-			_, _ = s.ChannelMessageSend(m.ChannelID, "pong")
-		} else if m.Content == BotPrefix+"last raid" {
-			id := getLogs()
-			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s", id))
-		} else if m.Content == BotPrefix+"last fight" || m.Content == BotPrefix+"last boss" {
-			id := getLogs()
-			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s#fight=last&type=damage-done", id))
-		} else {
-			fmt.Println("prefix was given but command not identified")
-			_, _ = s.ChannelMessageSend(m.ChannelID, "I'm sorry MASTER, little me don't understand this command.\nPlease Master, if you want that command explain me what I have to do!?")
-		}
+		commands.ExecuteCommand(s, m.Message, BotPrefix, t0)
+		return
 	}
 
 	fmt.Println(m.Author.Username + ": " + m.Content)
-}
-
-func getLogs() string {
-	token := os.Getenv("WCL_TOKEN")
-	wclapi := warcraftlogs.New(token)
-	reports := wclapi.ReportsForGuild("Sons of Eredar", warcraft.Realm_Eredar, warcraft.Region_EU)
-	last := reports[len(reports)-1]
-	return *last.Id
 }
