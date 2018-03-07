@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 	// Internal imports
-	"github.com/zewa-crit/zewa-bot/commands"
+	Command "./commands"
 	// defacto default library for working with discord API
 	"github.com/bwmarrin/discordgo"
 )
@@ -89,7 +89,7 @@ func OnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 	}
 	
 	if strings.HasPrefix(m.Content, BotPrefix) {
-		commands.ExecuteCommand(s, m.Message, BotPrefix, t0)
+		Command.ExecuteCommand(s, m.Message, BotPrefix, t0)
 		return
 	}
 

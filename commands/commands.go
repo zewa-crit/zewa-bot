@@ -62,14 +62,15 @@ func HandleLastCommand(s *discordgo.Session, m *discordgo.Message, t0 time.Time)
 	reports := wclapi.ReportsForGuild("Sons of Eredar", warcraft.Realm_Eredar, warcraft.Region_EU)
 	last := reports[len(reports)-1]
 	id := *last.Id
+	unix := time.Unix(*last.StartTime, 0)
 	cmd := strings.Split(m.Content, " ")
 
     if len(cmd) > 1 {
 		fmt.Println("[INFO] Looking up information about last raid: ")
 		if cmd[1] == "fight" || cmd[1] == "boss" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s#fight=last&type=damage-done", id))
+		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s#fight=last&type=damage-done\nReport vom %02dT.%02d.%d", id, unix.Day(), unix.Month(), unix.Year()))
 		} else if cmd[1]  == "raid" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s", id))
+		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s\nReport vom %02dT.%02d.%d", id, unix.Day(), unix.Month(), unix.Year()))
 		} else if cmd[1]  == "help" {
 			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf(`The %s command gives information about the last Raid performed by the guild Sons of Eredar
 Supported Commands are: 
