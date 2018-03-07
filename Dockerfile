@@ -4,6 +4,7 @@ ARG BUILD_DATE
 ARG VCS_REF
 ARG VERSION
 COPY main.go .
+ADD commands ./commands
 RUN go get -d -v github.com/bwmarrin/discordgo \
   && go get -d -v github.com/alexejk/go-warcraftlogs \
   && CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o bot .
