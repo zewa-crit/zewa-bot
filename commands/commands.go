@@ -6,13 +6,25 @@ import (
 	"strings"
 	"time"
 
-	"github.com/alexejk/go-warcraftlogs"
-	"github.com/alexejk/go-warcraftlogs/types/warcraft"
+	"github.com/peuserik/go-warcraftlogs"
+	"github.com/peuserik/go-warcraftlogs/types/warcraft"
 	"github.com/bwmarrin/discordgo"
 )
 
 // ExecuteCommand External handler for chat commands
 func ExecuteCommand(s *discordgo.Session, m *discordgo.Message, BotPrefix string, t0 time.Time) {
+
+	reneid := ""
+	if rid := os.Getenv("RENE_ID"); rid != "" {
+		reneid = rid
+	}
+
+	if m.Author.ID == reneid { // Rene user.id
+		fmt.Println(m.Author.Username + ": " + m.Content)
+		s.ChannelMessageSend(m.ChannelID, "You are not my master! leave me alone!\nPlease MASTER protect me from him.")
+		return
+	}
+	
 	msg := strings.Split(strings.TrimSpace(m.Content), BotPrefix)[1]
 
 	if len(msg) > 2 {
@@ -64,12 +76,15 @@ func HandleLastCommand(s *discordgo.Session, m *discordgo.Message, t0 time.Time)
 	id := *last.Id
 	cmd := strings.Split(m.Content, " ")
 
+	endtime := time.Unix(0, *last.EndTime * int64(time.Millisecond))
+	formatTime := endtime.Format("2006-01-02 15:04")
+
     if len(cmd) > 1 {
 		fmt.Println("[INFO] Looking up information about last raid: ")
 		if cmd[1] == "fight" || cmd[1] == "boss" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s#fight=last&type=damage-done", id))
+		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s` \nhttps://www.warcraftlogs.com/reports/%s#fight=last&type=damage-done", formatTime, id))
 		} else if cmd[1]  == "raid" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s", id))
+		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s` \nhttps://www.warcraftlogs.com/reports/%s", formatTime, id))
 		} else if cmd[1]  == "help" {
 			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf(`The %s command gives information about the last Raid performed by the guild Sons of Eredar
 Supported Commands are: 
@@ -84,21 +99,22 @@ Supported Commands are:
 	}
 }
 
-//HandleUnknownCommand is the default for any commands not listed
-func HandleUnknownCommand(s *discordgo.Session, m *discordgo.Message, msg string) {
-
-	c, err := s.UserChannelCreate(m.Author.ID)
-	if err != nil {
-		println("[ERROR] Unable to open User Channel: ", err)
-		return
-	}
-	s.ChannelMessageSend(c.ID, "The command ` "+msg+" ` is not recognized.")
-	s.ChannelMessageSend(m.ChannelID, "I'm sorry MASTER, little me don't understand this command.\nPlease Master, if you want that command explain me what I have to do!?")
-}
-
 func getWCLApi() *warcraftlogs.WarcraftLogs {
 	token := os.Getenv("WCL_TOKEN")
 	wclapi := warcraftlogs.New(token)
 
 	return wclapi
+}
+
+//HandleUnknownCommand is the default for any commands not listed
+func HandleUnknownCommand(s *discordgo.Session, m *discordgo.Message, msg string) {
+
+	// c, err := s.UserChannelCreate(m.Author.ID)
+	// if err != nil {
+	// 	println("[ERROR] Unable to open User Channel: ", err)
+	// 	return
+	// } 
+	// Example for direct message to user
+	//s.ChannelMessageSend(c.ID, "The command ` "+msg+" ` is not recognized.")
+	s.ChannelMessageSend(m.ChannelID, "I'm sorry MASTER, little me don't understand this command.\nPlease Master, if you want that command explain me what I have to do!?")
 }
