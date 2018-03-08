@@ -83,15 +83,16 @@ func OnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 		return
 	}
 
+	fmt.Println(m.Author.Username + ": " + m.Content)
+	
+	// if I'm myself just log the chat entry and return nothing
 	if m.Author.ID == BotID {
-		fmt.Println(m.Author.Username + ": " + m.Content)
 		return
 	}
 	
+	// Check for prefix and if found forward to handler
 	if strings.HasPrefix(m.Content, BotPrefix) {
 		commands.ExecuteCommand(s, m.Message, BotPrefix, t0)
 		return
 	}
-
-	fmt.Println(m.Author.Username + ": " + m.Content)
 }
