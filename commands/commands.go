@@ -2,6 +2,7 @@ package commands
 
 import (
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 	"time"
@@ -26,13 +27,19 @@ func ExecuteCommand(s *discordgo.Session, m *discordgo.Message, BotPrefix string
 	case "ping":
 		fmt.Println("[INFO] ping command identified")
 		HandlePingCommand(s, m)
+	case "pong":
+		fmt.Println("[INFO] pong command identified")
+		HandlePongCommand(s, m)
+	case "raider.io":
+		fmt.Println("[INFO] raider.io command identified")
+		HandleRaiderIOCommand(s, m)
 	case "last":
 		fmt.Println("[INFO] last command identified")
 		HandleLastCommand(s, m, t0)
 	default:
 		fmt.Println("[INFO] prefix was given but command not identified")
 		HandleUnknownCommand(s, m, msg)
-	}	
+	}
 }
 
 //HandleInfoCommand handles everything related to info command
@@ -56,26 +63,65 @@ func HandlePingCommand(s *discordgo.Session, m *discordgo.Message) {
 	s.ChannelMessageSend(m.ChannelID, "pong")
 }
 
+//HandlePongCommand is for !pong
+func HandlePongCommand(s *discordgo.Session, m *discordgo.Message) {
+
+	s.ChannelMessageSend(m.ChannelID, "ping")
+}
+
+//HandleRaiderIOCommand is for !raider.io
+func HandleRaiderIOCommand(s *discordgo.Session, m *discordgo.Message) {
+
+	cmd := strings.Split(m.Content, " ")
+
+	if len(cmd) > 1 {
+		fmt.Println("[INFO] Looking up information on raider.io ")
+
+		req, err := http.NewRequest("GET", "https://raider.io/api/v1/characters/profile?region=eu&realm=eredar&name="+cmd[1], nil)
+		if err != nil {
+			println("[ERROR] Unable to open Request to Raider.io: ", err)
+		}
+		req.Header.Set("Accept", "application/json")
+
+		resp, err := http.DefaultClient.Do(req)
+
+		if err != nil {
+			println("[ERROR] Unable to do Request: ", err)
+		}
+		defer resp.Body.Close()
+
+		if resp.StatusCode == 200 {
+			s.ChannelMessageSend(m.ChannelID, "https://raider.io/characters/eu/eredar/"+cmd[1])
+		}
+
+		if resp.StatusCode == 400 {
+			s.ChannelMessageSend(m.ChannelID, "The character probably does not exist")
+		}
+	} else {
+		s.ChannelMessageSend(m.ChannelID, "Please insert a charactername")
+	}
+}
+
 //HandleLastCommand displays information about warcraft logs
-func HandleLastCommand(s *discordgo.Session, m *discordgo.Message, t0 time.Time) {	
+func HandleLastCommand(s *discordgo.Session, m *discordgo.Message, t0 time.Time) {
 	wclapi := getWCLApi()
 	reports := wclapi.ReportsForGuild("Sons of Eredar", warcraft.Realm_Eredar, warcraft.Region_EU)
 	last := reports[len(reports)-1]
 	id := *last.Id
 	cmd := strings.Split(m.Content, " ")
 
-    if len(cmd) > 1 {
+	if len(cmd) > 1 {
 		fmt.Println("[INFO] Looking up information about last raid: ")
 		if cmd[1] == "fight" || cmd[1] == "boss" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s#fight=last&type=damage-done", id))
-		} else if cmd[1]  == "raid" {
-		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s", id))
-		} else if cmd[1]  == "help" {
+			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s#fight=last&type=damage-done", id))
+		} else if cmd[1] == "raid" {
+			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("https://www.warcraftlogs.com/reports/%s", id))
+		} else if cmd[1] == "help" {
 			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf(`The %s command gives information about the last Raid performed by the guild Sons of Eredar
 Supported Commands are: 
 !last fight - Synonymous for !last boss. Shows the direct link to last encountered boss.
 !last boss  - Synonymous for !last fight. Shows the direct link to last encountered boss.
-!last raid  - Shows the link for the last Raid`,cmd[0]))
+!last raid  - Shows the link for the last Raid`, cmd[0]))
 		} else {
 			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Unknown extension for %s command", cmd[0]))
 		}
