@@ -10,8 +10,8 @@ import (
 	"github.com/peuserik/go-warcraftlogs"
 	"github.com/peuserik/go-warcraftlogs/types/warcraft"
 	"github.com/bwmarrin/discordgo"
-	"github.com/FuzzyStatic/blizzard/worldofwarcraft"
 	"github.com/FuzzyStatic/blizzard"
+	"github.com/FuzzyStatic/blizzard/worldofwarcraft"
 )
 
 // ExecuteCommand External handler for chat commands
