@@ -10,6 +10,8 @@ import (
 	"github.com/peuserik/go-warcraftlogs"
 	"github.com/peuserik/go-warcraftlogs/types/warcraft"
 	"github.com/bwmarrin/discordgo"
+	"github.com/FuzzyStatic/blizzard/worldofwarcraft"
+	"github.com/FuzzyStatic/blizzard"
 )
 
 // ExecuteCommand External handler for chat commands
@@ -48,6 +50,9 @@ func ExecuteCommand(s *discordgo.Session, m *discordgo.Message, BotPrefix string
 	case "last":
 		fmt.Println("[INFO] last command identified")
 		HandleLastCommand(s, m, t0)
+	case "ilvl", "itemlevel":
+		fmt.Println("[INFO] itemlevel command identified")
+		HandleItemLevelCommand(s, m, t0)
 	default:
 		fmt.Println("[INFO] prefix was given but command not identified")
 		HandleUnknownCommand(s, m, msg)
@@ -143,6 +148,26 @@ Supported Commands are:
 	} else {
 		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("for %s command, you need a valid extension: \nboss\nfight\nraid", cmd[0]))
 	}
+}
+
+func HandleItemLevelCommand(s *discordgo.Session, m *discordgo.Message, t0 time.Time) {
+	api := getWowApi()
+	cmd := strings.Split(m.Content, " ")
+	if len(cmd) > 1 {
+		character, err := api.GetCharacterWithItems("eredar", cmd[1])
+		if err != nil {
+			fmt.Println(err)
+			return
+		}
+		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Average Item Level (equipped) for %s: %d", character.Name, character.Items.AverageItemLevelEquipped))
+	}
+}
+
+func getWowApi() *worldofwarcraft.WorldOfWarcraft {
+	var api *worldofwarcraft.WorldOfWarcraft
+	blizzApiKey := os.Getenv("BLIZZ_API_KEY")
+	api = worldofwarcraft.New(blizzard.Auth{AccessToken: blizzApiKey, APIKey: blizzApiKey}, blizzard.EU)
+	return api
 }
 
 func getWCLApi() *warcraftlogs.WarcraftLogs {

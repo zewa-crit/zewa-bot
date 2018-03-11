@@ -67,10 +67,22 @@ docker run -d --name zewa-bot -e DC_TOKEN=$DiscordToken zewacrit/zewa-bot
 
 * You need an API token from warcraft logs for using the wcl features of the bot
 
-[] ToDo Add description how to get an APi token for WCL
+[] ToDo Add description how to get an API token for WCL
 
-* Then start the bot with the addional env var WCL_TOKEN
+* Then start the bot with the additional env var WCL_TOKEN
 
 ```bash
 docker run -d --name zewa-bot -e DC_TOKEN=$DiscordToken -e WCL_TOKEN=$WarcraftlogsApiToken zewacrit/zewa-bot
 ```
+
+### World of Warcraft
+
+* You need an API key from dev.battle.net for using the wow features of the bot
+    * Create an account at https://dev.battle.net
+    * Register for an application
+    * After confirmation you receive key
+    * Add env var to docker startup
+```bash
+docker run -d --name zewa-bot -e BLIZZ_API_KEY=$BlizzKey zewacrit/zewa-bot
+ ``` 
+ 
