@@ -23,8 +23,6 @@ var (
 	// to not have unwanted bot activities while chatting; defaults to "!"
 	BotPrefix string
 
-	// BotID: The id of the user object; defaults to unset
-	BotID string
 )
 
 var t0 time.Time
@@ -49,15 +47,6 @@ func main() {
 		return
 	}
 	fmt.Println("[INFO] Session Created")
-
-	// Get user object for active user; Who am I ?
-	u, err := dg.User("@me")
-	if err != nil {
-		fmt.Println(err.Error())
-	}
-
-	// User ID from active user object, from the bot itself.
-	BotID = u.ID
 
 	// Add message handler before opening the session to the bot.
 	dg.AddHandler(OnMessageCreate)
@@ -85,8 +74,8 @@ func OnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
 
 	fmt.Println(m.Author.Username + ": " + m.Content)
 	
-	// if I'm myself just log the chat entry and return nothing
-	if m.Author.ID == BotID {
+	// if user is a bot just log the chat entry and return nothing
+	if m.Author.Bot {
 		return
 	}
 	
