@@ -49,10 +49,10 @@ func ExecuteCommand(s *discordgo.Session, m *discordgo.Message, BotPrefix string
 		HandleRaiderIOCommand(s, m)
 	case "last":
 		fmt.Println("[INFO] last command identified")
-		HandleLastCommand(s, m, t0)
+		HandleLastCommand(s, m)
 	case "ilvl", "itemlevel":
 		fmt.Println("[INFO] itemlevel command identified")
-		HandleItemLevelCommand(s, m, t0)
+		HandleItemLevelCommand(s, m)
 	default:
 		fmt.Println("[INFO] prefix was given but command not identified")
 		HandleUnknownCommand(s, m, msg)
@@ -120,7 +120,7 @@ func HandleRaiderIOCommand(s *discordgo.Session, m *discordgo.Message) {
 
 
 //HandleLastCommand displays information about warcraft logs
-func HandleLastCommand(s *discordgo.Session, m *discordgo.Message, t0 time.Time) {
+func HandleLastCommand(s *discordgo.Session, m *discordgo.Message) {
 	wclapi := getWCLApi()
 	reports := wclapi.ReportsForGuild("Sons of Eredar", warcraft.Realm_Eredar, warcraft.Region_EU)
 	last := reports[len(reports)-1]
@@ -150,16 +150,34 @@ Supported Commands are:
 	}
 }
 
-func HandleItemLevelCommand(s *discordgo.Session, m *discordgo.Message, t0 time.Time) {
+func HandleItemLevelCommand(s *discordgo.Session, m *discordgo.Message) {
 	api := getWowApi()
 	cmd := strings.Split(m.Content, " ")
-	if len(cmd) > 1 {
-		character, err := api.GetCharacterWithItems("eredar", cmd[1])
+	if len(cmd) == 2 {
+		charIdentifier := strings.Split(cmd[1], "-")
+		realm := "eredar"
+		inputName := cmd[1]
+		if len(charIdentifier) > 2 {
+			sendItemLevelUsage(s, m)
+			return
+		} else if len(charIdentifier) == 2 {
+			inputName = charIdentifier[0]
+			realm = charIdentifier[1]
+		}
+		character, err := api.GetCharacterWithItems(realm, inputName)
 		if err != nil {
 			fmt.Println(err)
+			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Cannot find a character named %s on %s", inputName, realm))
 			return
 		}
-		_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("Average Item Level (equipped) for %s: %d", character.Name, character.Items.AverageItemLevelEquipped))
+		lastUpdated := time.Unix(0, character.LastModified*int64(time.Millisecond)).Format("2006-01-02 15:04")
+		_, _ = s.ChannelMessageSend(m.ChannelID,
+			fmt.Sprintf("Average Item Level (equipped) for %s: **%d** (last updated %s)",
+				character.Name,
+				character.Items.AverageItemLevelEquipped,
+				lastUpdated))
+	} else {
+		sendItemLevelUsage(s, m)
 	}
 }
 
@@ -168,6 +186,15 @@ func getWowApi() *worldofwarcraft.WorldOfWarcraft {
 	blizzApiKey := os.Getenv("BLIZZ_API_KEY")
 	api = worldofwarcraft.New(blizzard.Auth{AccessToken: blizzApiKey, APIKey: blizzApiKey}, blizzard.EU)
 	return api
+}
+
+func sendItemLevelUsage(s *discordgo.Session, m *discordgo.Message) {
+	_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf(`The %s command gives information about the equipped item level of a character
+Defaults to EU region and Eredar realm.
+Querying for other regions is not supported.
+Querying for realms with more than one word is not supported.
+To query characters from other realms you can add the name of the realm after the characters name with an "-" between the character name and the realm name, e.g.
+`+ "`!itemlevel Telár-Antonidas`\n", "itemlevel"))
 }
 
 func getWCLApi() *warcraftlogs.WarcraftLogs {
@@ -187,5 +214,5 @@ func HandleUnknownCommand(s *discordgo.Session, m *discordgo.Message, msg string
 	// } 
 	// Example for direct message to user
 	//s.ChannelMessageSend(c.ID, "The command ` "+msg+" ` is not recognized.")
-	s.ChannelMessageSend(m.ChannelID, "I'm sorry MASTER, little me don't understand this command.\nPlease Master, if you want that command explain me what I have to do!?")
+	s.ChannelMessageSend(m.ChannelID, "I'm sorry MASTER, little me doesn't understand this command.\nPlease Master, if you want that command explain me what I have to do!?")
 }
