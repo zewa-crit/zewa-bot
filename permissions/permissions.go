@@ -68,34 +68,34 @@ const (
 )
 
 var permissionmap = map[string]int{
-	"CREATE_INSTANT_INVITE": 1,
-	"KICK_MEMBERS":          2,
-	"BAN_MEMBERS":           4,
-	"ADMINISTRATOR":         8,
-	"MANAGE_CHANNELS":       16,
-	"MANAGE_GUILD":          32,
-	"ADD_REACTIONS":         64,
-	"VIEW_AUDIT_LOG":        128,
-	"VIEW_CHANNEL":          1024,
-	"SEND_MESSAGES":         2048,
-	"SEND_TTS_MESSAGES":     4096,
-	"MANAGE_MESSAGES":       8912,
-	"EMBED_LINKS":           16384,
-	"ATTACH_FILES":          32768,
-	"READ_MESSAGE_HISTORY":  65536,
-	"MENTION_EVERYONE":      131072,
-	"USE_EXTERNAL_EMOJIS":   262144,
-	"CONNECT":               1048576,
-	"SPEAK":                 2097152,
-	"MUTE_MEMBERS":          4194304,
-	"DEAFEN_MEMBERS":        8388608,
-	"MOVE_MEMBERS":          16777216,
-	"USE_VAD":               33554432,
-	"CHANGE_NICKNAME":       67108864,
-	"MANAGE_NICKNAMES":      134217728,
-	"MANAGE_ROLES":          268435456,
-	"MANAGE_WEBHOOKS":       536870912,
-	"MANAGE_EMOJIS":         1073741824,
+	CreateInstantInvite: 1,
+	KickMembers:         2,
+	BanMembers:          4,
+	Administrator:       8,
+	ManageChannels:      16,
+	ManageGuild:         32,
+	AddReactions:        64,
+	ViewAuditLog:        128,
+	ViewChannel:         1024,
+	SendMessages:        2048,
+	SendTTSMessages:     4096,
+	ManageMessages:      8912,
+	EmbedLinks:          16384,
+	AttachFiles:         32768,
+	ReadMessageHistory:  65536,
+	MentionEveryone:     131072,
+	UseExternalEmojis:   262144,
+	Connect:             1048576,
+	Speak:               2097152,
+	MuteMembers:         4194304,
+	DeafenMembers:       8388608,
+	MoveMembers:         16777216,
+	UseVad:              33554432,
+	ChangeNickname:      67108864,
+	ManageNicknames:     134217728,
+	ManageRoles:         268435456,
+	ManageWebHooks:      536870912,
+	ManageEmojis:        1073741824,
 }
 
 //GetUserPermissions Returns a Map of all Permissions for a User
@@ -115,10 +115,11 @@ func GetUserPermissions(session *discordgo.Session, user *discordgo.User, guildi
 		return nil
 	}
 	var memberroles []*discordgo.Role
-	for _, guildrole := range guildroles {
-		if guildrole.ID == member.Roles[0] {
-			memberroles = append(memberroles, guildrole)
-			break
+	for _, role := range member.Roles {
+		for _, guildrole := range guildroles {
+			if guildrole.ID == role {
+				memberroles = append(memberroles, guildrole)
+			}
 		}
 	}
 	for _, memberrole := range memberroles {
