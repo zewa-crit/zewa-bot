@@ -1,17 +1,14 @@
 package main
 
 import (
-	//"github.com/alexejk/go-warcraftlogs"
 	"fmt"
 	"os"
-	"strings"
-	"time"
+	
 	// Internal imports
-	"github.com/zewa-crit/zewa-bot/commands"
-	// defacto default library for working with discord API
-	"github.com/bwmarrin/discordgo"
+	"github.com/zewa-crit/zewa-bot/util/commands"
+	"github.com/zewa-crit/zewa-bot/util/bot"
+	_ "github.com/zewa-crit/zewa-bot/commands"
 )
-
 // Environment parameters used for vars to be set on startup
 //
 var (
@@ -22,66 +19,24 @@ var (
 	// BotPrefix: The string prefix to identify direct Bot commands and
 	// to not have unwanted bot activities while chatting; defaults to "!"
 	BotPrefix string
-
 )
 
-var t0 time.Time
-
 func main() {
-	t0 = time.Now()
 	// Default BotPrefix to "!", then check if env var is set.
 	// if "BotPrefix" env is set override default value.
 	BotPrefix = "!"
 	if bp := os.Getenv("BotPrefix"); bp != "" {
 		BotPrefix = bp
 	}
-
-	// Get the env var value for the oauth2 token
+	commands.BotPrefix = BotPrefix
 	Token = os.Getenv("DC_TOKEN")
 
-	// Construct a new session and connect to the bot with oauth token,
-	// then get the session object
-	dg, err := discordgo.New("Bot " + Token)
-	if err != nil {
-		fmt.Println("error creating Discord session,", err)
-		return
-	}
-	fmt.Println("[INFO] Session Created")
+	bot.Start(Token)
 
-	// Add message handler before opening the session to the bot.
-	dg.AddHandler(OnMessageCreate)
-	//dg.AddHandler(messageHandler)
-	err = dg.Open()
-
-	if err != nil {
-		fmt.Println(err.Error())
-		return
-	}
-
-	fmt.Println("Bot is running")
+	fmt.Println("[INFO] Bot is now running.  Press CTRL-C to exit.")
 
 	// keep bot running for now.
 	<-make(chan struct{})
 	return
 
-}
-
-//OnMessageCreate handles message objects
-func OnMessageCreate(s *discordgo.Session, m *discordgo.MessageCreate) {
-	if s == nil || m == nil {
-		return
-	}
-
-	fmt.Println(m.Author.Username + ": " + m.Content)
-	
-	// if user is a bot just log the chat entry and return nothing
-	if m.Author.Bot {
-		return
-	}
-	
-	// Check for prefix and if found forward to handler
-	if strings.HasPrefix(m.Content, BotPrefix) {
-		commands.ExecuteCommand(s, m.Message, BotPrefix, t0)
-		return
-	}
 }
