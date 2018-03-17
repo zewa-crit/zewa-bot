@@ -5,6 +5,7 @@ ARG VCS_REF
 ARG VERSION
 COPY main.go .
 ADD commands ./commands
+ADD util ./util
 RUN go get -d -v github.com/bwmarrin/discordgo \
   && go get -d -v github.com/peuserik/go-warcraftlogs \
   && go get -d -v github.com/FuzzyStatic/blizzard \
