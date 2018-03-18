@@ -1,4 +1,4 @@
-package botCommands
+package botcommands
 
 import (
 	"github.com/zewa-crit/zewa-bot/util/commands"
