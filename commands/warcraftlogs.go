@@ -14,7 +14,7 @@ import (
 func init() {
 	err := checkDependencies()
 	if err != nil {
-		fmt.Errorf("dependenies not fulfilled, skipping command register", err)
+		fmt.Errorf("error when checking dependencies: %s \nskipping registration", err)
 		return
 	}
 	commands.RegisterCommand("last", wclCommand, "Gives information and/or links to warcraftlogs.com\n" +
