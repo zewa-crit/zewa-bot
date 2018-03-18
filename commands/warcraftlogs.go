@@ -14,7 +14,7 @@ import (
 func init() {
 	err := checkDependencies()
 	if err != nil {
-		fmt.Errorf("error when checking dependencies: %s \nskipping registration", err)
+		fmt.Sprintf("error when checking dependencies: %s \nskipping registration of warcraftlogs commands", err)
 		return
 	}
 	commands.RegisterCommand("last", wclCommand, "Gives information and/or links to warcraftlogs.com\n" +
