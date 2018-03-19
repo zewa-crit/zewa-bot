@@ -91,9 +91,10 @@ func GetCommand(msg string) (CommandFunction, string, []string) {
 
 func onSessionCreate(session *discordgo.Session, connect *discordgo.Connect) {
 	fmt.Println("INFO Connection done")
-	cont := "Hello! I'm **Zewa-Bot**.\nIf you need Help, just ask for it with `!help`\nThen I can see what I can do for you. :)"
-	_,err = session.ChannelMessageSend("419880731133607950", cont)
+	me := session.State.User.Username
 
+	cont := fmt.Sprintf("Hello! I'm **%s**.\nIf you need Help, just ask for it with `!help`\nThen I can see what I can do for you. :)", me)
+	_, err = session.ChannelMessageSend("419880731133607950", cont)
 }
 
 func OnMessageCreate(session *discordgo.Session, message *discordgo.MessageCreate) {
