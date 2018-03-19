@@ -1,11 +1,12 @@
-package BotCommands
+package botcommands
 
 import (
-	"github.com/zewa-crit/zewa-bot/util/commands"
-	"github.com/bwmarrin/discordgo"
-	"time"
 	"fmt"
 	"log"
+	"time"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/zewa-crit/zewa-bot/util/commands"
 )
 
 func init() {
@@ -21,7 +22,7 @@ func pingCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands
 	}
 	str := "Answer from Bot in " + elapsed.String()
 
-	_,err = s.ChannelMessageEdit(message.ChannelID, message.ID, "Pinging myself...\n" + str)
+	_, err = s.ChannelMessageEdit(message.ChannelID, message.ID, "Pinging myself...\n"+str)
 	if err != nil {
 		log.Println("Can't send message to channel.")
 		panic(err)
