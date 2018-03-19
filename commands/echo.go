@@ -1,10 +1,11 @@
 package botcommands
 
 import (
-	"github.com/zewa-crit/zewa-bot/util/commands"
-	"github.com/bwmarrin/discordgo"
 	"fmt"
 	"strings"
+
+	"github.com/bwmarrin/discordgo"
+	"github.com/zewa-crit/zewa-bot/util/commands"
 )
 
 func init() {
