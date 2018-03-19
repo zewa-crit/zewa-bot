@@ -41,6 +41,7 @@ func HelpCommand(session *discordgo.Session, message *discordgo.MessageCreate, c
 
 	fmt.Println("[DEBUG] inside HelpCommand")
 
+	me := session.State.User.Username
 	com := Commands
 	des := CommandDesc
 	if true {
@@ -54,7 +55,7 @@ func HelpCommand(session *discordgo.Session, message *discordgo.MessageCreate, c
 			}
 		}
 
-		header := "PeuseBotGO!"
+		header := me +" Help Overview!"
 		resp := "```md\n"
 		resp += header + "\n" + strings.Repeat("-", len(header)) + "\n\n"
 

@@ -17,10 +17,8 @@ func init() {
 		fmt.Sprintf("error when checking dependencies: %s \nskipping registration of warcraftlogs commands", err)
 		return
 	}
-	commands.RegisterCommand("last", wclCommand, "Gives information and/or links to warcraftlogs.com\n" +
-																"raid - shows link for the last guild raid\n" +
-																"fight / boss - shows link for the last boss fight of the last guild raid\n")
-	commands.RegisterCommand("wcl", wclCommand, "Alias for last")
+	commands.RegisterCommand("last", wclCommand, "Gives information and/or links to warcraftlogs.com. For more info *!last help*")
+	commands.RegisterCommand("wcl", wclCommand, "Alias for *!last*")
 }
 
 func wclCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands.Context) error {
