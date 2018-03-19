@@ -67,6 +67,7 @@ func HelpCommand(session *discordgo.Session, message *discordgo.MessageCreate, c
 	}
 
 	fmt.Println("[DEBUG] HelpAcahe is :" + HelpCache)
+	_,err = session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("Hello %s,\nThanks for your call. Please find the help topics in the list below.", message.Author.Username))
 	_,err = session.ChannelMessageSend(message.ChannelID, HelpCache)
 	if err != nil {
 		log.Println("[ERROR] Can't send message to channel.")
@@ -95,6 +96,7 @@ func onSessionCreate(session *discordgo.Session, connect *discordgo.Connect) {
 	me := session.State.User.Username
 
 	cont := fmt.Sprintf("Hello! I'm **%s**.\nIf you need Help, just ask for it with `!help`\nThen I can see what I can do for you. :)", me)
+	// TODO: find channelID by connect.
 	_, err = session.ChannelMessageSend("233981229609779200", cont)
 }
 
