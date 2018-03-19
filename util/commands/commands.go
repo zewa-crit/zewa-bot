@@ -94,7 +94,7 @@ func onSessionCreate(session *discordgo.Session, connect *discordgo.Connect) {
 	me := session.State.User.Username
 
 	cont := fmt.Sprintf("Hello! I'm **%s**.\nIf you need Help, just ask for it with `!help`\nThen I can see what I can do for you. :)", me)
-	_, err = session.ChannelMessageSend("419880731133607950", cont)
+	_, err = session.ChannelMessageSend("233981229609779200", cont)
 }
 
 func OnMessageCreate(session *discordgo.Session, message *discordgo.MessageCreate) {
