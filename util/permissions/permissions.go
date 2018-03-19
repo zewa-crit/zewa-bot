@@ -2,9 +2,9 @@ package permissions
 
 import (
 	// defacto default library for working with discord API
-	"fmt"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/zewa-crit/zewa-bot/util/commands"
 )
 
 // View https://discordapp.com/developers/docs/topics/permissions#permissions for more Information
@@ -99,20 +99,18 @@ var permissionmap = map[string]int{
 }
 
 //GetUserPermissions Returns a Map of all Permissions for a User
-func GetUserPermissions(session *discordgo.Session, user *discordgo.User, guildid string) map[string]bool {
+func GetUserPermissions(session *discordgo.Session, user *discordgo.User, context *commands.Context) (map[string]bool, error) {
 	result := make(map[string]bool)
 	for key := range permissionmap {
 		result[key] = false
 	}
-	member, err := session.GuildMember(guildid, user.ID)
+	member, err := session.GuildMember(context.GuildID, user.ID)
 	if err != nil {
-		fmt.Println(err.Error())
-		return nil
+		return nil, err
 	}
-	guildroles, err := session.GuildRoles(guildid)
+	guildroles, err := session.GuildRoles(context.GuildID)
 	if err != nil {
-		fmt.Println(err.Error())
-		return nil
+		return nil, err
 	}
 	var memberroles []*discordgo.Role
 	for _, role := range member.Roles {
@@ -129,5 +127,5 @@ func GetUserPermissions(session *discordgo.Session, user *discordgo.User, guildi
 			}
 		}
 	}
-	return result
+	return result, nil
 }
