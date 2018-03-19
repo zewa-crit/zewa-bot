@@ -8,10 +8,10 @@ import (
 )
 
 func init() {
-	commands.RegisterCommand("echo", EchoCommand, "Echos what was given. As quote")
+	commands.RegisterCommand("echo", echoCommand, "Echos what was given. As quote")
 }
 
-func EchoCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands.Context) error {
+func echoCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands.Context) error {
 	go s.ChannelMessageSendEmbed(m.ChannelID, &discordgo.MessageEmbed{
 		Type: "rich",
 		Author: &discordgo.MessageEmbedAuthor{
