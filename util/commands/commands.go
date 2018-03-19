@@ -22,6 +22,7 @@ func init() {
 	Commands = make(map[string]CommandFunction)
 	CommandDesc = make(map[string]string)
 	Discord, _ = discordgo.New()
+	Discord.AddHandler(onSessionCreate)
 	Discord.AddHandler(OnMessageCreate)
 	RegisterCommand("help", HelpCommand, "Prints all registered commands")
 }
@@ -86,6 +87,13 @@ func GetCommand(msg string) (CommandFunction, string, []string) {
 		return nil, "", nil
 	}
 	return Commands[args[0]], args[0], args[1:]
+}
+
+func onSessionCreate(session *discordgo.Session, connect *discordgo.Connect) {
+	fmt.Println("INFO Connection done")
+	cont := "Hello! I'm **Zewa-Bot**.\nIf you need Help, just ask for it with `!help`\nThen I can see what I can do for you. :)"
+	_,err = session.ChannelMessageSend("419880731133607950", cont)
+
 }
 
 func OnMessageCreate(session *discordgo.Session, message *discordgo.MessageCreate) {

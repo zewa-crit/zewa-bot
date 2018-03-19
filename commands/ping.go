@@ -10,10 +10,10 @@ import (
 )
 
 func init() {
-	commands.RegisterCommand("ping", PingCommand, "Sends a ping and measures the latency")
+	commands.RegisterCommand("ping", pingCommand, "Sends a ping and measures the latency")
 }
 
-func PingCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands.Context) error {
+func pingCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands.Context) error {
 	start := time.Now()
 	message, err := s.ChannelMessageSend(m.ChannelID, "Pinging myself...")
 	elapsed := time.Since(start)
