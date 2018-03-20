@@ -3,6 +3,7 @@ package botcommands
 import (
 	"fmt"
 	"net/http"
+	"net/url"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/zewa-crit/zewa-bot/util/commands"
@@ -18,7 +19,7 @@ func raiderIoCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *comm
 	if len(ctx.Args) > 0 {
 		fmt.Println("[INFO] Looking up information on raider.io ")
 
-		req, err := http.NewRequest("GET", "https://raider.io/api/v1/characters/profile?region=eu&realm=eredar&name="+ctx.Args[0], nil)
+		req, err := http.NewRequest("GET", "https://raider.io/api/v1/characters/profile?region=eu&realm=eredar&name="+url.QueryEscape(ctx.Args[0]), nil)
 		if err != nil {
 			println("[ERROR] Unable to open Request to Raider.io: ", err)
 		}
@@ -33,7 +34,7 @@ func raiderIoCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *comm
 		defer resp.Body.Close()
 
 		if resp.StatusCode == 200 {
-			s.ChannelMessageSend(m.ChannelID, "https://raider.io/characters/eu/eredar/"+ctx.Args[0])
+			s.ChannelMessageSend(m.ChannelID, "https://raider.io/characters/eu/eredar/"+url.QueryEscape(ctx.Args[0]))
 		}
 
 		if resp.StatusCode == 400 {
