@@ -12,7 +12,7 @@ import (
 )
 
 func init() {
-	err := checkDependencies()
+	err := checkWCLDependencies()
 	if err != nil {
 		fmt.Sprintf("error when checking dependencies: %s \nskipping registration of warcraftlogs commands", err)
 		return
@@ -52,7 +52,7 @@ Supported Commands are:
 	return nil
 }
 
-func checkDependencies() error {
+func checkWCLDependencies() error {
 	token := os.Getenv("WCL_TOKEN")
 	if len(token) == 0 {
 		return errors.New("environment variable \"WCL_TOKEN\" not set")
