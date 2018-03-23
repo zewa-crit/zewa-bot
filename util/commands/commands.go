@@ -66,7 +66,7 @@ func HelpCommand(session *discordgo.Session, message *discordgo.MessageCreate, c
 		HelpCache = resp
 	}
 
-	fmt.Println("[DEBUG] HelpAcahe is :" + HelpCache)
+	fmt.Println("[DEBUG] HelpCache is :" + HelpCache)
 	_,err = session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("Hello %s,\nThanks for your call. Please find the help topics in the list below.", message.Author.Username))
 	_,err = session.ChannelMessageSend(message.ChannelID, HelpCache)
 	if err != nil {
