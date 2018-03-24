@@ -123,11 +123,13 @@ func splitCharIdentifier(charIdentifier string) (string, string, error) {
 	idParts := strings.Split(charIdentifier, "-")
 	realm := "eredar"
 	inputName := idParts[0]
-	if len(idParts) > 2 || len(idParts) == 0 || len(inputName) == 0 || len(idParts[1]) == 0 {
+	if len(idParts) > 2 || len(idParts) == 0 || len(inputName) == 0 {
 		return "", "", errors.New("illegal character identifier format")
-	} else if len(charIdentifier) == 2 {
+	} else if len(idParts) == 2 {
 		inputName = idParts[0]
-		realm = idParts[1]
+		if len(idParts[1]) > 0 {
+			realm = idParts[1]
+		}
 	}
 	return realm, inputName, nil
 }
