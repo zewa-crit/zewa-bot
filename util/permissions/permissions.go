@@ -2,6 +2,7 @@ package permissions
 
 import (
 	// defacto default library for working with discord API
+	"errors"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/zewa-crit/zewa-bot/util/commands"
@@ -98,17 +99,57 @@ var permissionmap = map[string]int{
 	ManageEmojis:        1073741824,
 }
 
-//GetUserPermissions Returns a Map of all Permissions for a User
 func GetUserPermissions(session *discordgo.Session, user *discordgo.User, context *commands.Context) (map[string]bool, error) {
 	result := make(map[string]bool)
 	for key := range permissionmap {
 		result[key] = false
 	}
-	member, err := session.GuildMember(context.GuildID, user.ID)
+
+	memberroles, err := getMembersRoles(session, context.GuildID, user.ID)
 	if err != nil {
 		return nil, err
 	}
-	guildroles, err := session.GuildRoles(context.GuildID)
+	for _, memberrole := range memberroles {
+		for key, value := range permissionmap {
+			if memberrole.Permissions&value > 0 {
+				result[key] = true
+			}
+		}
+	}
+	return result, nil
+}
+
+func CheckUserHasPermission(session *discordgo.Session, user *discordgo.User, context *commands.Context, permission string) (bool, error) {
+	memberroles, err := getMembersRoles(session, context.GuildID, user.ID)
+	if err != nil {
+		return false, err
+	}
+	if value, ok := permissionmap[permission]; ok {
+		for _, memberrole := range memberroles {
+			if memberrole.Permissions&value > 0 {
+				return true, nil
+			}
+		}
+		return false, nil
+	}
+	err = errors.New("Permission not found")
+	return false, err
+}
+
+func GetPermissions() []string {
+	var result []string
+	for key := range permissionmap {
+		result = append(result, key)
+	}
+	return result
+}
+
+func getMembersRoles(session *discordgo.Session, guildID string, userID string) ([]*discordgo.Role, error) {
+	member, err := session.GuildMember(guildID, userID)
+	if err != nil {
+		return nil, err
+	}
+	guildroles, err := session.GuildRoles(guildID)
 	if err != nil {
 		return nil, err
 	}
@@ -120,12 +161,5 @@ func GetUserPermissions(session *discordgo.Session, user *discordgo.User, contex
 			}
 		}
 	}
-	for _, memberrole := range memberroles {
-		for key, value := range permissionmap {
-			if memberrole.Permissions&value > 0 {
-				result[key] = true
-			}
-		}
-	}
-	return result, nil
+	return memberroles, nil
 }
