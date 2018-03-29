@@ -12,15 +12,13 @@ import (
 )
 
 func init() {
-	err := checkDependencies()
+	err := checkWCLDependencies()
 	if err != nil {
 		fmt.Sprintf("error when checking dependencies: %s \nskipping registration of warcraftlogs commands", err)
 		return
 	}
-	commands.RegisterCommand("last", wclCommand, "Gives information and/or links to warcraftlogs.com\n" +
-																"raid - shows link for the last guild raid\n" +
-																"fight / boss - shows link for the last boss fight of the last guild raid\n")
-	commands.RegisterCommand("wcl", wclCommand, "Alias for last")
+	commands.RegisterCommand("last", wclCommand, "Gives information and/or links to warcraftlogs.com. For more info *!last help*")
+	commands.RegisterCommand("wcl", wclCommand, "Alias for *!last*")
 }
 
 func wclCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands.Context) error {
@@ -54,7 +52,7 @@ Supported Commands are:
 	return nil
 }
 
-func checkDependencies() error {
+func checkWCLDependencies() error {
 	token := os.Getenv("WCL_TOKEN")
 	if len(token) == 0 {
 		return errors.New("environment variable \"WCL_TOKEN\" not set")

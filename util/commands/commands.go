@@ -22,6 +22,7 @@ func init() {
 	Commands = make(map[string]CommandFunction)
 	CommandDesc = make(map[string]string)
 	Discord, _ = discordgo.New()
+	Discord.AddHandler(onSessionCreate)
 	Discord.AddHandler(OnMessageCreate)
 	RegisterCommand("help", HelpCommand, "Prints all registered commands")
 }
@@ -40,6 +41,7 @@ func HelpCommand(session *discordgo.Session, message *discordgo.MessageCreate, c
 
 	fmt.Println("[DEBUG] inside HelpCommand")
 
+	me := session.State.User.Username
 	com := Commands
 	des := CommandDesc
 	if true {
@@ -53,7 +55,7 @@ func HelpCommand(session *discordgo.Session, message *discordgo.MessageCreate, c
 			}
 		}
 
-		header := "PeuseBotGO!"
+		header := me +" Help Overview!"
 		resp := "```md\n"
 		resp += header + "\n" + strings.Repeat("-", len(header)) + "\n\n"
 
@@ -64,7 +66,8 @@ func HelpCommand(session *discordgo.Session, message *discordgo.MessageCreate, c
 		HelpCache = resp
 	}
 
-	fmt.Println("[DEBUG] HelpAcahe is :" + HelpCache)
+	fmt.Println("[DEBUG] HelpCache is :" + HelpCache)
+	_,err = session.ChannelMessageSend(message.ChannelID, fmt.Sprintf("Hello %s,\nThanks for your call. Please find the help topics in the list below.", message.Author.Username))
 	_,err = session.ChannelMessageSend(message.ChannelID, HelpCache)
 	if err != nil {
 		log.Println("[ERROR] Can't send message to channel.")
@@ -86,6 +89,15 @@ func GetCommand(msg string) (CommandFunction, string, []string) {
 		return nil, "", nil
 	}
 	return Commands[args[0]], args[0], args[1:]
+}
+
+func onSessionCreate(session *discordgo.Session, connect *discordgo.Connect) {
+	fmt.Println("INFO Connection done")
+	me := session.State.User.Username
+
+	cont := fmt.Sprintf("Hello! I'm **%s**.\nIf you need Help, just ask for it with `!help`\nThen I can see what I can do for you. :)", me)
+	// TODO: find channelID by connect.
+	_, err = session.ChannelMessageSend("233981229609779200", cont)
 }
 
 func OnMessageCreate(session *discordgo.Session, message *discordgo.MessageCreate) {
