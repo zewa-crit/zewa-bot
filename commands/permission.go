@@ -14,6 +14,7 @@ func init() {
 	commands.RegisterCommand("permission", PermissionCommand, "Show all Permissions of a User")
 }
 
+
 func PermissionCommand(s *discordgo.Session, m *discordgo.MessageCreate, context *commands.Context) error {
 	per, err := permissions.GetUserPermissions(s, m.Author, context)
 	if err != nil {
