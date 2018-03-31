@@ -16,6 +16,7 @@ var Discord *discordgo.Session
 var BotPrefix string
 var err error
 var Description string
+var greeted = false
 
 
 func init() {
@@ -93,11 +94,13 @@ func GetCommand(msg string) (CommandFunction, string, []string) {
 
 func onSessionCreate(session *discordgo.Session, connect *discordgo.Connect) {
 	fmt.Println("INFO Connection done")
-	me := session.State.User.Username
-
-	cont := fmt.Sprintf("Hello! I'm **%s**.\nIf you need Help, just ask for it with `!help`\nThen I can see what I can do for you. :)", me)
-	// TODO: find channelID by connect.
-	_, err = session.ChannelMessageSend("233981229609779200", cont)
+	if !greeted {
+		me := session.State.User.Username
+		cont := fmt.Sprintf("Hello! I'm **%s**.\nIf you need Help, just ask for it with `!help`\nThen I can see what I can do for you. :)", me)
+		// TODO: find channelID by connect.
+		_, err = session.ChannelMessageSend("233981229609779200", cont)
+		greeted = true
+	}
 }
 
 func OnMessageCreate(session *discordgo.Session, message *discordgo.MessageCreate) {
