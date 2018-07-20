@@ -19,7 +19,7 @@ func init() {
 func rtdCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands.Context) error {
 	args := ctx.Args
 
-	if len(args) > 0 {
+	if len(args) > 1 && len(args) < 3 {
 		fmt.Println("[INFO] determining the rnd output")
 
 		startRange, err := strconv.Atoi(args[0])
@@ -37,7 +37,7 @@ func rtdCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands.
 		s.ChannelMessageSend(m.ChannelID, m.Author.Username+" rolled: \n"+outrand)
 
 	} else {
-		s.ChannelMessageSend(m.ChannelID, "Please insert a a range")
+		s.ChannelMessageSend(m.ChannelID, "missing Parameters please insert a range like *!rnd 1 10*")
 	}
 	return nil
 }
