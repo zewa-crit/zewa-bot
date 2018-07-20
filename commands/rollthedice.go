@@ -11,9 +11,9 @@ import (
 )
 
 func init() {
-	commands.RegisterCommand("rtd", rtdCommand, "Roll the dice, for more information *!rtd help*")
-	commands.RegisterCommand("rollthedice", rtdCommand, "Roll the dice, for more information *!rtd help*")
-	commands.RegisterCommand("rnd", rtdCommand, "Roll the dice, for more information *!rtd help*")
+	commands.RegisterCommand("rtd", rtdCommand, "Roll the dice, give a range for a random number")
+	commands.RegisterCommand("rollthedice", rtdCommand, "Alias for *!rtd*")
+	commands.RegisterCommand("rnd", rtdCommand, "Alias for *!rtd*")
 }
 
 func rtdCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands.Context) error {
