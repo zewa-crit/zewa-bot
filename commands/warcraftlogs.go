@@ -38,9 +38,15 @@ func wclCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands.
 		fmt.Println("[INFO] Looking up information about last raid: ")
 		primaryModifier := args[0]
 		if primaryModifier == "fight" || primaryModifier == "boss" {
-			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s` \nhttps://www.warcraftlogs.com/reports/%s#fight=last&type=damage-done", formatTime, id))
+			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%[1]s`" +
+				"\nhttps://www.warcraftlogs.com/reports/%[2]s#fight=last&type=damage-done" +
+				"\nhttps://www.wowanalyzer.com/report/%[2]s" +
+				"\nhttps://www.wipefest.net/report/%[2]s/fight/last", formatTime, id))
 		} else if primaryModifier == "raid" {
-			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%s` \nhttps://www.warcraftlogs.com/reports/%s", formatTime, id))
+			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf("`%[1]s`" +
+					"\nhttps://www.warcraftlogs.com/reports/%[2]s" +
+					"\nhttps://www.wowanalyzer.com/report/%[2]s" +
+					"\nhttps://www.wipefest.net/report/%[2]s", formatTime, id))
 		} else if primaryModifier == "help" {
 			_, _ = s.ChannelMessageSend(m.ChannelID, fmt.Sprintf(`The "last" command gives information about the last Raid performed by the guild Sons of Eredar
 Supported Commands are: 
