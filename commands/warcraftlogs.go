@@ -1,14 +1,15 @@
 package botcommands
 
 import (
-	"github.com/zewa-crit/zewa-bot/util/commands"
-	"github.com/bwmarrin/discordgo"
-	"os"
-	"github.com/peuserik/go-warcraftlogs"
 	"errors"
 	"fmt"
-	"time"
+	"github.com/bwmarrin/discordgo"
+	"github.com/peuserik/go-warcraftlogs"
 	"github.com/peuserik/go-warcraftlogs/types/warcraft"
+	"github.com/zewa-crit/zewa-bot/util/commands"
+	"os"
+	"sort"
+	"time"
 )
 
 func init() {
@@ -24,10 +25,13 @@ func init() {
 func wclCommand(s *discordgo.Session, m *discordgo.MessageCreate, ctx *commands.Context) error {
 	wclapi := getWCLApi()
 	reports := wclapi.ReportsForGuild("Sons of Eredar", warcraft.Realm_Eredar, warcraft.Region_EU)
-	last := reports[len(reports)-1]
-	id := *last.Id
+	sort.Slice(reports, func(i, j int) bool {
+		return *reports[i].EndTime > *reports[j].EndTime
+	})
+	latest := reports[0]
+	id := *latest.Id
 	args := ctx.Args
-	endtime := time.Unix(0, *last.EndTime * int64(time.Millisecond))
+	endtime := time.Unix(0, *latest.EndTime * int64(time.Millisecond))
 	formatTime := endtime.Format("2006-01-02 15:04")
 
 	if len(args) > 0 {
